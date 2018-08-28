@@ -301,7 +301,6 @@ let getAccountInfo = () => {
 			account[0].owner = account[0].owner.key_auths[0][0];
 			account[0].active = account[0].active.key_auths[0][0];
 			account[0].posting = account[0].posting.key_auths[0][0];
-			account[0].reputation = rep2(account[0].reputation);
 			account[0].power = amalgam.formatter.vestToAmalgam(account[0].vesting_shares, totalVestingShares, totalVestingFundAmalgam).toFixed(2);
 			let voteAge = (new Date - new Date(account[0].last_vote_time + 'Z')) / 1000;
 			let currentVotingPower = account[0].voting_power + (10000 * voteAge / 432000);
