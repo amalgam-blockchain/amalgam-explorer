@@ -4,7 +4,7 @@ let operationFormatter = (object) => {
 	for (var key in object) {
 		let operationValue = escapeHtml(object[key]);
 		switch (key) {
-			case 'title': case 'body': case 'memo': continue;
+			case 'memo': continue;
 			case 'parent_author': operation.parent_author = object[key]; break;
 			case 'author': case 'comment_author': operation.author = object[key]; break;
 		}
