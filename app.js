@@ -11,7 +11,6 @@ initHtmlElements([ '#head-block-number', '#revers-blocks-count', '#main-page', '
 let $modalGetConfig = new Modal(document.getElementById('modal-get-config'));
 let $modalAboutBlock = new Modal(document.getElementById('modal-about-block'));
 let $searchVal = $search.querySelector('.form-control[name="search"]');
-let nodeAddress = 'wss://ws.amalgam.money';
 let totalVestingShares;
 let totalVestingFundAmalgam;
 let currentPageNumber = 1;
@@ -21,8 +20,6 @@ let notResultText = '-';
 let transactionsAllCount = 0;
 let configData = null;
 let propertiesData = null;
-
-amalgam.config.set('websocket', nodeAddress);
 
 amalgam.api.getConfig((err, result) => {
 	$blockchainVersion.innerText = '...';
