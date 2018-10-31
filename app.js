@@ -18,8 +18,6 @@ let workRealTime = true;
 let accountHistoryFrom = -1;
 let notResultText = '-';
 let transactionsAllCount = 0;
-let configData = null;
-let propertiesData = null;
 
 amalgam.api.getConfig((err, result) => {
 	$blockchainVersion.innerText = '...';
@@ -30,9 +28,6 @@ amalgam.api.getConfig((err, result) => {
 			let $newRow = $modalGetConfigTableTbody.insertRow(0);
 			$newRow.innerHTML = `<tr><td>${key}</td><td><b>${result[key]}</b></td></tr>`;
 		}
-                $chainPropertiesTableTbody.querySelector('b[data-prop="create_account_delegation_time"]').innerText = result.AMALGAM_CREATE_ACCOUNT_DELEGATION_TIME / 1000000;
-                configData = result;
-                showCalculatedProperties();
 	}
 });
 
@@ -42,8 +37,7 @@ amalgam.api.getChainProperties((err, properties) => {
 			let prop = $chainPropertiesTableTbody.querySelector('b[data-prop="' + key + '"]');
 			if (prop) prop.innerText = properties[key];
 		}
-                propertiesData = properties;
-                showCalculatedProperties();
+                $chainPropertiesTableTbody.querySelector('b[data-prop="min_delegation"]').innerText = assetDivide(properties.account_creation_fee, 3);
 	}
 });
 
@@ -55,17 +49,6 @@ amalgam.api.getCurrentMedianHistoryPrice((err, properties) => {
 		}
 	}
 });
-
-let showCalculatedProperties = () => {
-        if (configData !== null && propertiesData !== null) {
-                $chainPropertiesTableTbody.querySelector('b[data-prop="create_account_min_delegation"]').innerText =
-                        assetMultiply(propertiesData.account_creation_fee, configData.AMALGAM_CREATE_ACCOUNT_WITH_AMALGAM_MODIFIER * configData.AMALGAM_CREATE_ACCOUNT_DELEGATION_RATIO);
-                $chainPropertiesTableTbody.querySelector('b[data-prop="create_account_min_amalgam_fee"]').innerText =
-                        assetMultiply(propertiesData.account_creation_fee, configData.AMALGAM_CREATE_ACCOUNT_WITH_AMALGAM_MODIFIER);
-                $chainPropertiesTableTbody.querySelector('b[data-prop="min_delegation"]').innerText =
-                        assetMultiply(propertiesData.account_creation_fee, 10);
-        }
-}
 
 $changeWorkRealTime.addEventListener('click', () => {
 	if (workRealTime) {
@@ -160,10 +143,9 @@ let getDynamicGlobalPropertiesHandler = () => {
 getDynamicGlobalPropertiesHandler();
 
 let getRewardFundHandler = () => {
-	amalgam.api.getRewardFund('post', (err, fund) => {
-		if ( ! err) {
-                    $globalPropertiesTableTbody.querySelector('b[data-prop="reward_fund_reward_balance"]').innerText = fund.reward_balance;
-                    $globalPropertiesTableTbody.querySelector('b[data-prop="reward_fund_recent_claims"]').innerText = fund.recent_claims;
+	amalgam.api.getAccounts(['reward_fund'], (err, account) => {
+		if ( ! err && account[0]) {
+                    $globalPropertiesTableTbody.querySelector('b[data-prop="reward_fund_balance"]').innerText = account[0].balance;
                 }
 	});
 }
@@ -299,9 +281,6 @@ let getAccountInfo = () => {
 			account[0].active = account[0].active.key_auths[0][0];
 			account[0].posting = account[0].posting.key_auths[0][0];
 			account[0].power = amalgam.formatter.vestToAmalgam(account[0].vesting_shares, totalVestingShares, totalVestingFundAmalgam).toFixed(2);
-			let voteAge = (new Date - new Date(account[0].last_vote_time + 'Z')) / 1000;
-			let currentVotingPower = account[0].voting_power + (10000 * voteAge / 432000);
-			account[0].voting_power = Math.min(currentVotingPower / 100, 100).toFixed(2) + '%';
 			if (account[0].witness_votes.length == 0) account[0].witness_votes = notResultText;
 			
 			for (let key in account[0]) {

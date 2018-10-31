@@ -109,9 +109,6 @@
 								</thead>
 								<tbody>
 									<tr><td>Account Creation Fee</td><td><b data-prop="account_creation_fee">...</b></td></tr>
-									<tr><td>Create Account Delegation Time</td><td><b data-prop="create_account_delegation_time">...</b></td></tr>
-									<tr><td>Create Account Min Delegation</td><td><b data-prop="create_account_min_delegation">...</b></td></tr>
-									<tr><td>Create Account Min Amalgam Fee</td><td><b data-prop="create_account_min_amalgam_fee">...</b></td></tr>
 									<tr><td>Maximum Block Size</td><td><b data-prop="maximum_block_size">...</b></td></tr>
 									<tr><td>Min Delegation</td><td><b data-prop="min_delegation">...</b></td></tr>
 									<tr><td>AMLD Interest Rate</td><td><b data-prop="abd_interest_rate">...</b></td></tr>
@@ -140,8 +137,7 @@
 									<tr><td>Confidential AMLD supply</td><td><b data-prop="confidential_abd_supply">...</b></td></tr>
 									<tr><td>Total vesting fund</td><td><b data-prop="total_vesting_fund_amalgam">...</b></td></tr>
 									<tr><td>Total vesting shares</td><td><b data-prop="total_vesting_shares">...</b></td></tr>
-									<tr><td>Total reward fund</td><td><b data-prop="reward_fund_reward_balance">...</b></td></tr>
-									<tr><td>Total recent claims</td><td><b data-prop="reward_fund_recent_claims">...</b></td></tr>
+									<tr><td>Total reward fund</td><td><b data-prop="reward_fund_balance">...</b></td></tr>
 									<tr><td>AMLD interest rate</td><td><b data-prop="abd_interest_rate">...</b></td></tr>
 									<tr><td>AMLD print rate</td><td><b data-prop="abd_print_rate">...</b></td></tr>
 									<tr><td>Maximum block size</td><td><b data-prop="maximum_block_size">...</b></td></tr>
@@ -153,7 +149,6 @@
 									<tr><td>Max virtual bandwidth</td><td><b data-prop="max_virtual_bandwidth">...</b></td></tr>
 									<tr><td>Head block id</td><td class="column-max"><b data-prop="head_block_id">...</b></td></tr>
 									<tr><td>Recent slots filled</td><td class="column-max"><b data-prop="recent_slots_filled">...</b></td></tr>
-									<tr><td>Vote power reserve rate</td><td><b data-prop="vote_power_reserve_rate">...</b></td></tr>
 								</tbody>
 							</table>
 						</div>
@@ -211,14 +206,11 @@
 													<h5 class="card-text">Balance <span class="badge badge-dark" data="balance"></span></h5>
 													<h5 class="card-text">Amalgam Power <span class="badge badge-dark" data="power"></span></h5>
 													<h5 class="card-text">Account create <span class="badge badge-dark" data="created"></span></h5>
-													<h5 class="card-text">Post count <span class="badge badge-dark" data="post_count"></span></h5>
 													<h5 class="card-text">Recovery account <span class="badge badge-dark" data="recovery_account"></span></h5>
 												</div>
 												<div class="col">
 													<h5 class="card-text">AMLD Balance <span class="badge badge-dark" data="abd_balance"></span></h5>
-													<h5 class="card-text">Voting power <span class="badge badge-dark" data="voting_power"></span></h5>
 													<h5 class="card-text">Last account update <span class="badge badge-dark" data="last_account_update"></span></h5>
-													<h5 class="card-text">Last post <span class="badge badge-dark" data="last_post"></span></h5>
 												</div>
 											</div>
 										</div>
@@ -254,17 +246,13 @@
 										<option value="account_update">account_update</option>
 										<option value="account_witness_proxy">account_witness_proxy</option>
 										<option value="account_witness_vote">account_witness_vote</option>
-										<option value="author_reward">author_reward</option>
 										<option value="cancel_transfer_from_savings">cancel_transfer_from_savings</option>
-										<option value="change_recovery_accounts">change_recovery_accounts</option>
-										<option value="comment">comment</option>
-										<option value="comment_benefactor_reward">comment_benefactor_reward</option>
-										<option value="comment_options">comment_options</option>
+										<option value="change_recovery_account">change_recovery_account</option>
 										<option value="convert">convert</option>
 										<option value="custom">custom</option>
+										<option value="custom_binary">custom_binary</option>
 										<option value="custom_json">custom_json</option>
-										<option value="curation_reward">curation_reward</option>
-										<option value="delete_comment">delete_comment</option>
+										<option value="delegate_vesting_shares">delegate_vesting_shares</option>
 										<option value="escrow_approve">escrow_approve</option>
 										<option value="escrow_dispute">escrow_dispute</option>
 										<option value="escrow_release">escrow_release</option>
@@ -272,30 +260,26 @@
 										<option value="feed_publish">feed_publish</option>
 										<option value="fill_convert_request">fill_convert_request</option>
 										<option value="fill_order">fill_order</option>
-										<option value="fill_transfer_from_saving">fill_transfer_from_saving</option>
+										<option value="fill_transfer_from_savings">fill_transfer_from_savings</option>
 										<option value="fill_vesting_withdraw">fill_vesting_withdraw</option>
-										<option value="follow">follow</option>
+										<option value="hardfork">hardfork</option>
 										<option value="interest">interest</option>
 										<option value="limit_order_cancel">limit_order_cancel</option>
 										<option value="limit_order_create">limit_order_create</option>
 										<option value="limit_order_create2">limit_order_create2</option>
-										<option value="liquidity_reward">liquidity_reward</option>
-										<option value="pow2">pow2</option>
-										<option value="reblog">reblog</option>
+										<option value="producer_reward">producer_reward</option>
 										<option value="recover_account">recover_account</option>
-										<option value="recover_account_recovery">recover_account_recovery</option>
+										<option value="request_account_recovery">request_account_recovery</option>
+										<option value="return_vesting_delegation">return_vesting_delegation</option>
 										<option value="set_withdraw_vesting_route">set_withdraw_vesting_route</option>
 										<option value="shutdown_witness">shutdown_witness</option>
 										<option value="transfer">transfer</option>
 										<option value="transfer_from_savings">transfer_from_savings</option>
 										<option value="transfer_to_savings">transfer_to_savings</option>
 										<option value="transfer_to_vesting">transfer_to_vesting</option>
-										<option value="vesting_deposit">vesting_deposit</option>
-										<option value="vote">vote</option>
 										<option value="withdraw_vesting">withdraw_vesting</option>
 										<option value="withdraw_vesting_route">withdraw_vesting_route</option>
 										<option value="witness_update">witness_update</option>
-										<option value="witness_vote">witness_vote</option>
 									</select>
 									operation filtered from <span class="badge badge-info" id="about-account-count">...</span> transactions
 								</h5>

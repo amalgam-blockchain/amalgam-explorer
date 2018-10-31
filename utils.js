@@ -5,8 +5,6 @@ let operationFormatter = (object) => {
 		let operationValue = escapeHtml(object[key]);
 		switch (key) {
 			case 'memo': continue;
-			case 'parent_author': operation.parent_author = object[key]; break;
-			case 'author': case 'comment_author': operation.author = object[key]; break;
 		}
 		let keyBeauty = key.charAt(0).toUpperCase() + key.slice(1).replace(/_/g, ' ');
 		if (typeof(object[key]) !== 'object') {
@@ -118,6 +116,12 @@ let assetToString = (asset) => {
                 amount = amount.substring(0, amount.length - precision) + '.' + amount.substring(amount.length - precision);
         }
         return amount + ' ' + asset[2];
+};
+
+let assetDivide = (asset, value) => {
+        let assetObject = assetFromString(asset);
+        assetObject[0] = assetObject[0] / value;
+        return assetToString(assetObject);
 };
 
 let assetMultiply = (asset, value) => {
