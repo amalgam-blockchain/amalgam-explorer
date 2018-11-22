@@ -41,7 +41,7 @@ amalgam.api.getChainProperties((err, properties) => {
 	}
 });
 
-amalgam.api.getCurrentMedianHistoryPrice((err, properties) => {
+amalgam.api.getCurrentPriceFeed((err, properties) => {
 	if ( ! err) {
 		for (let key in properties) {
 			let prop = $chainPropertiesTableTbody.querySelector('b[data-prop="' + key + '"]');
@@ -68,13 +68,25 @@ document.getElementById('clear-real-time').addEventListener('click', () => {
 	swal({title: 'Table real-time blocks cleared!', type: 'success', showConfirmButton: false, position: 'top-right', toast: true, timer: 3000});
 });
 
+let getOperationName = (operation) => {
+        let name = operation.type;
+        let suffix = '_operation';
+        if (name.endsWith(suffix)) {
+                return name.substring(0, name.length - suffix.length);
+        }
+        else {
+                return name;
+        }
+}
+
 let operationsHandler = (transactions, templateString) => {
 	let operations = {};
 	let operationsCount = 0;
 	transactions.forEach((transaction) => {
 		transaction.operations.forEach((operation) => {
-			if ( ! operations[operation[0]]) operations[operation[0]] = 0;
-			operations[operation[0]]++;
+                        let name = getOperationName(operation);
+			if ( ! operations[name]) operations[name] = 0;
+			operations[name]++;
 			operationsCount++;
 		});
 	});
@@ -122,6 +134,9 @@ amalgam.api.streamBlockNumber((err, lastBlock) => {
 	
 	getDynamicGlobalPropertiesHandler();
 	getRewardFundHandler();
+        if ( ! err && lastBlock % 20 == 0 ) {
+                getReserveRatioHandler();
+        }
 	
 });
 
@@ -142,8 +157,20 @@ let getDynamicGlobalPropertiesHandler = () => {
 }
 getDynamicGlobalPropertiesHandler();
 
+let getReserveRatioHandler = () => {
+	amalgam.api.getReserveRatio((err, properties) => {
+		if ( ! err) {
+			for (let key in properties) {
+				let prop = $globalPropertiesTableTbody.querySelector('b[data-prop="' + key + '"]');
+				if (prop) prop.innerText = properties[key];
+			}
+		}
+	});
+}
+getReserveRatioHandler();
+
 let getRewardFundHandler = () => {
-	amalgam.api.getAccounts(['reward_fund'], (err, account) => {
+	amalgam.api.findAccounts(['reward-fund'], (err, account) => {
 		if ( ! err && account[0]) {
                     $globalPropertiesTableTbody.querySelector('b[data-prop="reward_fund_balance"]').innerText = account[0].balance;
                 }
@@ -198,14 +225,14 @@ let getBlockFullInfo = (blockNumberVal) => {
 				transaction.operations.forEach((operation) => {
 					$newRow = $aboutBlockOperationsTableTbody.insertRow();
 					$newRow.innerHTML = `<tr>
-											<td rowspan="${Object.keys(operation[1]).length + 1}"><b>${operation[0]}</b></td>
+											<td rowspan="${Object.keys(operation.value).length + 1}"><b>${getOperationName(operation)}</b></td>
 										</tr>`;
-					for (let keyOp in operation[1]) {
-						operation[1][keyOp] = filterXSS(operation[1][keyOp]);
+					for (let keyOp in operation.value) {
+						operation.value[keyOp] = filterXSS(operation.value[keyOp]);
 						$newRow = $aboutBlockOperationsTableTbody.insertRow();
 						$newRow.innerHTML = `<tr>
 												<td>${keyOp}</td>
-												<td>${operation[1][keyOp]}</td>
+												<td>${operation.value[keyOp]}</td>
 											</tr>`;
 					}
 				});
@@ -275,18 +302,32 @@ $search.addEventListener('submit', (e) => {
 
 let getAccountInfo = () => {
 	let usernameVal = $searchVal.value;
-	amalgam.api.getAccounts([usernameVal], (err, account) => {
+	amalgam.api.findAccounts([usernameVal], (err, account) => {
 		if ( ! err && account[0]) {
 			account[0].owner = account[0].owner.key_auths[0][0];
 			account[0].active = account[0].active.key_auths[0][0];
 			account[0].posting = account[0].posting.key_auths[0][0];
 			account[0].power = amalgam.formatter.vestToAmalgam(account[0].vesting_shares, totalVestingShares, totalVestingFundAmalgam).toFixed(2);
-			if (account[0].witness_votes.length == 0) account[0].witness_votes = notResultText;
 			
 			for (let key in account[0]) {
 				let $aboutAccountPageParam = $aboutAccountPage.querySelector(`[data="${key}"]`);
 				if ($aboutAccountPageParam) $aboutAccountPageParam.innerText = account[0][key];
 			}
+                        
+                        amalgam.api.getWitnessVotes(account[0].name, (err, votes)) => {
+                                if ( ! err ) {
+                                        let witnessVotes;
+                                        if (votes.length == 0) {
+                                                witnessVotes = notResultText;
+                                        } else
+                                        {
+                                                witnessVotes = votes.map((vote) => {
+                                                        return vote.witness;
+                                                });
+                                        }
+                                        $aboutAccountPageParam.querySelector('[data="witness_votes"]').innerText = witnessVotes;
+                                }
+                        }
 		}
 	});
 }
@@ -321,18 +362,19 @@ let getAccountTransactions = () => {
 		if (transactions && transactions.length > 0) {
 			//transactions.reverse();
 			transactions.forEach((transaction) => {
-				if ( ! $aboutAccountFilter.value || (transaction[1].op[0] == $aboutAccountFilter.value)) {
+                                let name = getOperationName(transaction[1].op);
+				if ( ! $aboutAccountFilter.value || (name == $aboutAccountFilter.value)) {
 					operationsCount++;
 					let $newRow = $aboutAccountTableTbody.insertRow(0);
 					$newRow.className = 'table-light';
 					$newRow.innerHTML = `<tr>
 									<td>${transaction[1].timestamp}</td>
-									<td><a href="#account/${usernameVal}/${currentPageNumber}/${transaction[1].op[0]}">${transaction[1].op[0]}</a></td>
+									<td><a href="#account/${usernameVal}/${currentPageNumber}/${name}">${name}</a></td>
 									<td><a href="#block/${transaction[1].block}">${transaction[1].block}</a></td>
 									<td><a href="#tx/${transaction[1].trx_id}">${transaction[1].trx_id}</a></td>`;
 					$newRow.innerHTML += `</tr>`;
 					let $newSubRow = $aboutAccountTableTbody.insertRow(1);
-					$newSubRow.innerHTML = `<tr><td class="description" colspan="4">${operationFormatter(transaction[1].op[1])}</td></tr>`;
+					$newSubRow.innerHTML = `<tr><td class="description" colspan="4">${operationFormatter(transaction[1].op.value)}</td></tr>`;
 					let humanDescription = operationHumanFormatter(transaction[1].op);
 					if (humanDescription) {
 						let $newSubSubRow = $aboutAccountTableTbody.insertRow(2);
@@ -406,18 +448,19 @@ let getBlockInfo = (blockNumberVal, operationName, callback) => {
 
 			block.transactions.forEach((transaction) => {
 				transaction.operations.forEach((operation) => {
-					if (operation[0] == operationName) {
+                                        let name = getOperationName(operation);
+					if (name == operationName) {
 						//console.log(transaction.operations);
 						blockTransactionsArr.push(transaction);
 						$newRow = $modalAboutBlockOperationsTableTbody.insertRow();
 						$newRow.innerHTML = `<tr>
-												<td rowspan="${Object.keys(operation[1]).length + 1}"><b>${operation[0]}</b></td>
+												<td rowspan="${Object.keys(operation.value).length + 1}"><b>${name}</b></td>
 											</tr>`;
-						for (let keyOp in operation[1]) {
+						for (let keyOp in operation.value) {
 							$newRow = $modalAboutBlockOperationsTableTbody.insertRow();
 							$newRow.innerHTML = `<tr>
 													<td>${keyOp}</td>
-													<td>${operation[1][keyOp]}</td>
+													<td>${operation.value[keyOp]}</td>
 												</tr>`;
 						}
 
@@ -456,7 +499,7 @@ document.getElementById('get-config-btn').addEventListener('click', () => {
 });
 
 let getTransactionsAllCount = (callback) => {
-	amalgam.api.getAccountHistory($searchVal.value, -1, 0, (err, transactions) => {
+	amalgam.api.getAccountHistory($searchVal.value, -1, 1, (err, transactions) => {
 		if (transactions && transactions.length > 0) {
 			transactionsAllCount = transactions[0][0] + 1;
 		}
