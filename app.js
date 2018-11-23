@@ -314,7 +314,7 @@ let getAccountInfo = () => {
 				if ($aboutAccountPageParam) $aboutAccountPageParam.innerText = account[0][key];
 			}
                         
-                        amalgam.api.getWitnessVotes(account[0].name, (err, votes)) => {
+                        amalgam.api.getWitnessVotesByAccount(account[0].name, (err, votes) => {
                                 if ( ! err ) {
                                         let witnessVotes;
                                         if (votes.length == 0) {
@@ -325,9 +325,9 @@ let getAccountInfo = () => {
                                                         return vote.witness;
                                                 });
                                         }
-                                        $aboutAccountPageParam.querySelector('[data="witness_votes"]').innerText = witnessVotes;
+                                        $aboutAccountPage.querySelector('[data="witness_votes"]').innerText = witnessVotes;
                                 }
-                        }
+                        });
 		}
 	});
 }
