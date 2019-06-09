@@ -564,11 +564,11 @@ window.addEventListener('hashchange', () => {
 								const percentage = (100 * (witness.votes / oneM / totalVestingShares.split(' ')[0])).toFixed(2);
 								const isWitnessesDeactive = /AML1111111111111111111111111111111114T1Anm/.test(witness.signing_key);
 								const noPriceFeed = /0.000 AML/.test(witness.abd_exchange_rate.base);
-								if (isWitnessesDeactive || noPriceFeed) $newRow.className = 'table-danger';
+								if (isWitnessesDeactive /*|| noPriceFeed*/) $newRow.className = 'table-danger';
 								$newRow.innerHTML = `<tr>
 												<td class="witness-rank">${witnessRank}</td>
 												<td>
-													<h3><a ${witnessRank < 20 ? ' style="font-weight: bold"' : ''} target="_blank" href="#account/${witness.owner}">${witness.owner}</a></h3>
+													<h3><a ${witnessRank < 21 ? ' style="font-weight: bold"' : ''} target="_blank" href="#account/${witness.owner}">${witness.owner}</a></h3>
 													<!--<a class="font-weight-light text-dark witness-url" target="_blank" href="${witness.url}">witness url</a>-->
 												</td>
 												<td><h5><span class="badge badge-light">${approval}M</span></h5></td>
